@@ -1,0 +1,16 @@
+(() => {
+ 'use strict';
+ const header=document.getElementById('site-header'),menuButton=document.querySelector('.menu-toggle'),mobileNav=document.getElementById('mobile-nav'),topButton=document.querySelector('.to-top');
+ const updateScroll=()=>{header?.classList.toggle('scrolled',window.scrollY>16);topButton?.classList.toggle('visible',window.scrollY>400);};
+ window.addEventListener('scroll',updateScroll,{passive:true});updateScroll();
+ menuButton?.addEventListener('click',()=>{const open=menuButton.getAttribute('aria-expanded')!=='true';menuButton.setAttribute('aria-expanded',String(open));menuButton.setAttribute('aria-label',open?'Tutup menu':'Buka menu');menuButton.classList.toggle('open',open);mobileNav?.classList.toggle('open',open);});
+ mobileNav?.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{menuButton?.setAttribute('aria-expanded','false');menuButton?.classList.remove('open');mobileNav?.classList.remove('open');}));
+ topButton?.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+ if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target);}}),{threshold:.08,rootMargin:'0px 0px -18px 0px'});document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));}else document.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible'));
+ const filters=document.querySelectorAll('.filter'),gallery=document.querySelectorAll('.gallery-card');
+ filters.forEach(button=>button.addEventListener('click',()=>{const value=button.dataset.filter;filters.forEach(other=>{const active=other===button;other.classList.toggle('active',active);other.setAttribute('aria-pressed',String(active));});gallery.forEach(card=>card.hidden=value!=='Semua'&&card.dataset.category!==value);}));
+ const dialog=document.getElementById('gallery-dialog');
+ if(dialog&&typeof dialog.showModal==='function'){gallery.forEach(card=>card.addEventListener('click',()=>{const img=dialog.querySelector('img'),caption=dialog.querySelector('p');if(img&&caption){img.src=card.dataset.image;img.alt=card.dataset.title;caption.textContent=card.dataset.title;}dialog.showModal();}));dialog.querySelector('.lightbox-close')?.addEventListener('click',()=>dialog.close());dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close();});}
+ const form=document.getElementById('inquiry-form');
+ form?.addEventListener('submit',event=>{event.preventDefault();if(!form.reportValidity())return;const val=id=>document.getElementById(id)?.value.trim()||'-';const msg=['Halo CV Global Sinergi Nusantara, saya ingin berkonsultasi mengenai proyek.','','*Nama:* '+val('name'),'*Nomor Telepon:* '+val('phone'),'*Jenis Layanan:* '+val('service'),'*Lokasi Proyek:* '+val('location'),'','*Kebutuhan Proyek:*',val('message'),'','Mohon informasi proses selanjutnya. Terima kasih.'].join('\n');const url='https://wa.me/6281338055805?text='+encodeURIComponent(msg);const popup=window.open(url,'_blank','noopener,noreferrer');if(!popup)window.location.href=url;});
+})();
